@@ -50,7 +50,7 @@ begin
         if rising_edge (clk_i) then
             case state is
                 when idle =>
-                    if fifo_empty /= '0' then
+                    if fifo_empty = '0' then
                         state <= transmiting;
                         counter := 0;
                     end if;

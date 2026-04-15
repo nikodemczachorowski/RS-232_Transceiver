@@ -74,7 +74,6 @@ architecture Behavioral of top is
     Port ( clk_i : in STD_LOGIC;
            RXD_i : in STD_LOGIC;
            ascii_o : out std_logic_vector (7 downto 0);
-           new_char : out std_logic;
            led7_an_o : out STD_LOGIC_VECTOR (3 downto 0);
            led7_seg_o : out STD_LOGIC_VECTOR (7 downto 0));
     end component reciever;
@@ -106,19 +105,8 @@ rec : reciever
         clk_i => clk_i,
         RXD_i => RXD_i,
         ascii_o => char,
-        new_char => new_char,
         led7_an_o => led7_an_o,
         led7_seg_o => led7_seg_o
     );
     
-forward_char_to_fifo : process (new_char, clk_i) is
-    begin
-        if falling_edge (clk_i) then
-            read_en <= '0';
-        else
-            if new_char = '1' then
-                read_en <= '1';
-            end if;
-        end if;    
-    end process;
 end Behavioral;
