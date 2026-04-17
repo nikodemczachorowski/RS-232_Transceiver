@@ -30,6 +30,7 @@ use IEEE.NUMERIC_STD.ALL;
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
+use work.rs232_pkg.all;
 
 entity transmiter is
   Port ( clk_i : in std_logic;
@@ -40,19 +41,38 @@ entity transmiter is
 end transmiter;
 
 architecture Behavioral of transmiter is
-    type StateType is (idle, transmiting, finished);
+    type StateType is (idle, reading, transmiting);
     signal state : StateType := idle;
+    signal char_arr : CharArray;
+    signal next_char_pos : integer := 0;
+    signal data_ready_o : std_logic := '0';
+    signal transmision_finished_i : std_logic;
 begin
 
     process (clk_i) is
-        variable counter : integer := 0;
+
     begin
         if rising_edge (clk_i) then
+            fifo_re <= '0';
+            data_ready_o <= '0';
             case state is
                 when idle =>
                     if fifo_empty = '0' then
+                        state <= reading;
+                        fifo_re <= '1';
+                    end if;
+                when reading =>
+                    char_arr(next_char_pos) <= fifo_char;
+                    next_char_pos <= next_char_pos + 1;
+                    if next_char_pos = 18 or fifo_char = x"0D" then
                         state <= transmiting;
-                        counter := 0;
+                    end if;
+                    state <= idle;
+                when transmiting =>
+                    data_ready_o <= '1';
+                    if transmision_finished_i = '1' then
+                        next_char_pos <= 0;
+                        state <= idle;
                     end if;
             end case;     
         end if;
