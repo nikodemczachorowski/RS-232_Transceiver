@@ -48,13 +48,14 @@ begin
     );
 
     -- Proces generujący sygnał zegarowy
-    clk_process : process
-    begin
-        clk_i <= '0';
-        wait for clk_period / 2;
-        clk_i <= '1';
-        wait for clk_period / 2;
-    end process;
+--    clk_process : process
+--    begin
+--        clk_i <= '0';
+--        wait for clk_period / 2;
+--        clk_i <= '1';
+--        wait for clk_period / 2;
+--    end process;
+clk_i <= not clk_i after 5ns;
 
     -- Główny proces testowy (Stimulus)
     stim_proc: process

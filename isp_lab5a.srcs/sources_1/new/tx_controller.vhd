@@ -42,8 +42,12 @@ entity tx_controller is
 end tx_controller;
 
 architecture Behavioral of tx_controller is
-    type ControllerState is (idle, transmiting);
+    type ControllerState is (idle, transmiting, waiting_for_sender);
     signal state : ControllerState := idle;
+    attribute fsm_encoding: string;
+    attribute fsm_encoding of state: signal is "gray";
+    
+    signal debug_state_spy : STD_LOGIC_VECTOR(1 downto 0);
 
     component char_mem
        port (
@@ -74,7 +78,10 @@ begin
         idle_o => sender_ready_i,
         TXD_o => TXD_o
     );
-
+debug_state_spy <= "00" when state = idle else
+                   "01" when state = transmiting else
+                   "10" when state = waiting_for_sender else
+                   "11";
     p: process (clk_i) is
         variable curr_line : STD_LOGIC_VECTOR (3 downto 0) := "0000";
         variable curr_char : integer := 0;
@@ -90,8 +97,18 @@ begin
                         state <= transmiting;
                         transmision_finished_o <= '0';
                     end if;
+                when waiting_for_sender =>
+                    if sender_ready_i = '0' then
+                        state <= transmiting;
+                        
+                        if curr_line = "0000" and curr_char = 0 and curr_row = 0 then
+                            state <= idle;
+                            transmision_finished_o <= '1';
+                        end if;
+                    end if;
                 when transmiting =>
                     if sender_ready_i = '1' then
+                        state <= waiting_for_sender;
                         if curr_char_line(curr_row) = '1' then
                             char_o <= char_arr_i(curr_char);
                         else
@@ -113,10 +130,7 @@ begin
                     addra <= char_arr_i(curr_char) & curr_line;
                     curr_char_line := next_char_line;
 
-                    if curr_line = "0000" and curr_char = 0 and curr_row = 0 then
-                        state <= idle;
-                        transmision_finished_o <= '1';
-                    end if;
+                    
             end case;
         end if;
     end process;
