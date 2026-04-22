@@ -1,10 +1,11 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2025.2 (win64) Build 6299465 Fri Nov 14 19:35:11 GMT 2025
--- Date        : Wed Mar 18 21:35:18 2026
--- Host        : DESKTOP-KC81630 running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub e:/isp/isp_lab5a/isp_lab5a.gen/sources_1/ip/char_mem/char_mem_stub.vhdl
+-- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
+-- Date        : Wed Apr 22 18:04:29 2026
+-- Host        : archlinux running 64-bit Arch Linux
+-- Command     : write_vhdl -force -mode synth_stub
+--               /home/nikodem/repos/studia/RS-232_Transceiver/isp_lab5a.gen/sources_1/ip/char_mem/char_mem_stub.vhdl
 -- Design      : char_mem
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tcsg324-1

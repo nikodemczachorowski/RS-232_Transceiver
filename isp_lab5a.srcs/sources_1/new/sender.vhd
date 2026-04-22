@@ -35,7 +35,7 @@ entity sender is
     Port (clk_i : in STD_LOGIC;
           ascii_i : in std_logic_vector (7 downto 0); 
           ready_i : in std_logic;
-          ready_o : out std_logic;
+          idle_o : out std_logic;
           TXD_o : out std_logic );
 end sender;
 
@@ -50,7 +50,7 @@ begin
         variable shift_reg : std_logic_vector (8 downto 0);
     begin
         if rising_edge(clk_i) then
-            ready_o <= '0';
+            idle_o <= '0';
             case state is
                 when idle =>
                     if ready_i = '1' then
@@ -58,7 +58,7 @@ begin
                         shift_reg := ascii_i & '0';
                     else
                         TXD_o <= '1';
-                        ready_o <= '1';
+                        idle_o <= '1';
                     end if;
                 when transmiting =>
                     if counter = 10417 then
