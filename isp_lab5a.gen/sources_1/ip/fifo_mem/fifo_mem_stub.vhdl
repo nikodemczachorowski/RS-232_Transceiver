@@ -2,7 +2,7 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
--- Date        : Wed Apr 22 18:04:30 2026
+-- Date        : Thu Apr 23 04:43:15 2026
 -- Host        : archlinux running 64-bit Arch Linux
 -- Command     : write_vhdl -force -mode synth_stub
 --               /home/nikodem/repos/studia/RS-232_Transceiver/isp_lab5a.gen/sources_1/ip/fifo_mem/fifo_mem_stub.vhdl

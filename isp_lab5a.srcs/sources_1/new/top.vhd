@@ -41,17 +41,6 @@ entity top is
 end top;
 
 architecture Behavioral of top is
-    COMPONENT char_mem
-      PORT (
-        clka : IN STD_LOGIC;
-        addra : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-        douta : OUT STD_LOGIC_VECTOR(7 DOWNTO 0) 
-      );
-    END COMPONENT;
-    
-    signal chr_mem_addr : std_logic_vector(11 downto 0);
-    signal chr_mem_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    
     COMPONENT fifo_mem
       PORT (
         clk : IN STD_LOGIC;
@@ -69,27 +58,10 @@ architecture Behavioral of top is
     signal read : std_logic_vector (7 downto 0);
     signal empty : std_logic;
     signal full : std_logic;
-    
-    component reciever is
-    Port ( clk_i : in STD_LOGIC;
-           RXD_i : in STD_LOGIC;
-           ascii_o : out std_logic_vector (7 downto 0);
-           led7_an_o : out STD_LOGIC_VECTOR (3 downto 0);
-           led7_seg_o : out STD_LOGIC_VECTOR (7 downto 0));
-    end component reciever;
-    
     signal char : STD_LOGIC_VECTOR (7 downto 0);
-    signal new_char : std_logic;
 begin
 
-chr_mem : char_mem
-  PORT MAP (
-    clka => clk_i,
-    addra => chr_mem_addr,
-    douta => chr_mem_out
-  );
-  
-fifo : fifo_mem
+    fifo : fifo_mem
   PORT MAP (
     clk => clk_i,
     din => char,
@@ -100,13 +72,24 @@ fifo : fifo_mem
     empty => empty
   );
   
-rec : reciever
+  rec : entity work.reciever
     port map (
         clk_i => clk_i,
         RXD_i => RXD_i,
         ascii_o => char,
+        write_en_o => write_en,
         led7_an_o => led7_an_o,
         led7_seg_o => led7_seg_o
     );
+
+    transmiter_inst: entity work.transmiter
+     port map(
+        clk_i => clk_i,
+        fifo_re => read_en,
+        fifo_char => read,
+        fifo_empty => empty,
+        TXD_o => TXD_o
+    );
     
+    ld0 <= full;
 end Behavioral;

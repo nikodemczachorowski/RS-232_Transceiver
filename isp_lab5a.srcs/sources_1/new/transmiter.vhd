@@ -41,13 +41,23 @@ entity transmiter is
 end transmiter;
 
 architecture Behavioral of transmiter is
-    type StateType is (idle, reading, transmiting);
+    type StateType is (idle, reading, transmiting, waiting);
     signal state : StateType := idle;
     signal char_arr : CharArray;
     signal next_char_pos : integer := 0;
     signal data_ready_o : std_logic := '0';
     signal transmision_finished_i : std_logic;
 begin
+
+    tx_controller_inst: entity work.tx_controller
+     port map(
+        clk_i => clk_i,
+        data_ready_i => data_ready_o,
+        char_count_i => next_char_pos,
+        char_arr_i => char_arr,
+        transmision_finished_o => transmision_finished_i,
+        TXD_o => TXD_o
+    );
 
     process (clk_i) is
 
@@ -62,19 +72,24 @@ begin
                         fifo_re <= '1';
                     end if;
                 when reading =>
-                    char_arr(next_char_pos) <= fifo_char;
-                    next_char_pos <= next_char_pos + 1;
-                    if next_char_pos = 18 or fifo_char = x"0D" then
-                        state <= transmiting;
+                    if fifo_char /= x"0D" then
+                        char_arr(next_char_pos) <= fifo_char;
                     end if;
-                    state <= idle;
+                    next_char_pos <= next_char_pos + 1;
+                    if next_char_pos = 17 or fifo_char = x"0D" then
+                        state <= transmiting;
+                    else
+                        state <= idle;
+                    end if;
                 when transmiting =>
                     data_ready_o <= '1';
+                    state <= waiting;
+                when waiting =>
                     if transmision_finished_i = '1' then
                         next_char_pos <= 0;
                         state <= idle;
                     end if;
-            end case;     
+            end case;
         end if;
     end process;
 

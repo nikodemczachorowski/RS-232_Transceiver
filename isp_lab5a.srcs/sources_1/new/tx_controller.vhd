@@ -44,10 +44,7 @@ end tx_controller;
 architecture Behavioral of tx_controller is
     type ControllerState is (idle, transmiting, waiting_for_sender);
     signal state : ControllerState := idle;
-    attribute fsm_encoding: string;
-    attribute fsm_encoding of state: signal is "gray";
-    
-    signal debug_state_spy : STD_LOGIC_VECTOR(1 downto 0);
+
 
     component char_mem
        port (
@@ -78,10 +75,7 @@ begin
         idle_o => sender_ready_i,
         TXD_o => TXD_o
     );
-debug_state_spy <= "00" when state = idle else
-                   "01" when state = transmiting else
-                   "10" when state = waiting_for_sender else
-                   "11";
+
     p: process (clk_i) is
         variable curr_line : STD_LOGIC_VECTOR (3 downto 0) := "0000";
         variable curr_char : integer := 0;
@@ -92,7 +86,6 @@ debug_state_spy <= "00" when state = idle else
             char_ready_o <= '0';
             case state is
                 when idle =>
-                    transmision_finished_o <= '1';
                     if data_ready_i = '1' then
                         state <= transmiting;
                         transmision_finished_o <= '0';

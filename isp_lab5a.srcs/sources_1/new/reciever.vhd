@@ -35,6 +35,7 @@ entity reciever is
     Port ( clk_i : in STD_LOGIC;
            RXD_i : in STD_LOGIC;
            ascii_o : out std_logic_vector (7 downto 0);
+           write_en_o : out STD_LOGIC;
            led7_an_o : out STD_LOGIC_VECTOR (3 downto 0);
            led7_seg_o : out STD_LOGIC_VECTOR (7 downto 0));
 end reciever;
@@ -51,7 +52,7 @@ architecture Behavioral of reciever is
         led7_seg_o : out STD_LOGIC_VECTOR (7 downto 0)
     );
 end component encoder;
-     signal num : std_logic_vector (7 downto 0);
+    signal num : std_logic_vector (7 downto 0);
 begin
     
     seq: process (clk_i) is
@@ -60,6 +61,7 @@ begin
         variable position : integer := 0;
     begin
         if rising_edge(clk_i) then
+            write_en_o <= '0';
             case state is
                 when idle =>
                     if RXD_i = '0' then
@@ -76,7 +78,9 @@ begin
                         if (position = 8) then
                             state <= idle;
                             position := 0;
+                            ascii_o <= output;
                             num <= output;
+                            write_en_o <= '1';
                         else
                             output(position) := RXD_i;
                             position := (position + 1);
@@ -87,7 +91,6 @@ begin
             end case;
         end if;
     end process;
-    ascii_o <= num;
     E: encoder
         port map (
             clk_i => clk_i,
