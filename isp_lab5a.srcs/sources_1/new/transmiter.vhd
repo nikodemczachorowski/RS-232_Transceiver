@@ -74,9 +74,12 @@ begin
                 when reading =>
                     if fifo_char /= x"0D" then
                         char_arr(next_char_pos) <= fifo_char;
+                        next_char_pos <= next_char_pos + 1;
                     end if;
-                    next_char_pos <= next_char_pos + 1;
                     if next_char_pos = 17 or fifo_char = x"0D" then
+                        char_arr(next_char_pos + 1) <= x"0D"; --add CR at the end
+                        char_arr(next_char_pos + 2) <= x"0A"; --add LF at the end
+                        next_char_pos <= next_char_pos + 1;
                         state <= transmiting;
                     else
                         state <= idle;

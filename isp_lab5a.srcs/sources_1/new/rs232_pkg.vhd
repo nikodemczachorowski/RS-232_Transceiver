@@ -32,5 +32,5 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 package rs232_pkg is
-    type CharArray is array (0 to 17) of std_logic_vector (7 downto 0);
+    type CharArray is array (0 to 19) of std_logic_vector (7 downto 0);
 end package rs232_pkg;
