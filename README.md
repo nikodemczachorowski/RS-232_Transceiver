@@ -23,8 +23,3 @@ The project uses 2 modules generated via Vivado's IP catalog.
 ## Dependencies
 * FPGA synthesis environment like Vivado.
 * Artix-7 FPGA board.
-
-## Status
-Reciever works. It recieves signal and shows character code on board's LED display.
-Buffering was implemented but not tested.
-TX logic is not yet implemented.
