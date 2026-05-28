@@ -66,6 +66,9 @@ begin
                         counter := 0;
                         shift_reg := '1' & shift_reg(8 downto 1);
                         if pos = 10 then
+                            if ascii_i = x"0D" then
+                             --   report "enter sent";
+                            end if;
                             state <= idle;
                             pos := 0;
                             counter := 0;

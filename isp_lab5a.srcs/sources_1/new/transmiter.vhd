@@ -41,7 +41,7 @@ entity transmiter is
 end transmiter;
 
 architecture Behavioral of transmiter is
-    type StateType is (idle, reading, transmiting, waiting);
+    type StateType is (idle, reading, transmiting, waiting, read_prepare);
     signal state : StateType := idle;
     signal char_arr : CharArray;
     signal next_char_pos : integer := 0;
@@ -68,18 +68,25 @@ begin
             case state is
                 when idle =>
                     if fifo_empty = '0' then
-                        state <= reading;
+                        state <= read_prepare;
                         fifo_re <= '1';
                     end if;
+                when read_prepare =>
+                    state <= reading;
                 when reading =>
-                    if fifo_char /= x"0D" then
+                    if fifo_char /= x"0D" and fifo_char /= x"0A" then
                         char_arr(next_char_pos) <= fifo_char;
                         next_char_pos <= next_char_pos + 1;
                     end if;
-                    if next_char_pos = 17 or fifo_char = x"0D" then
+                    if next_char_pos = 17 then
                         char_arr(next_char_pos + 1) <= x"0D"; --add CR at the end
                         char_arr(next_char_pos + 2) <= x"0A"; --add LF at the end
-                        next_char_pos <= next_char_pos + 1;
+                        next_char_pos <= next_char_pos + 3;
+                        state <= transmiting;
+                    elsif fifo_char = x"0D" then
+                        char_arr(next_char_pos) <= x"0D"; --add CR at the end
+                        char_arr(next_char_pos + 1) <= x"0A"; --add LF at the end
+                        next_char_pos <= next_char_pos + 2;
                         state <= transmiting;
                     else
                         state <= idle;

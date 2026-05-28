@@ -83,22 +83,24 @@ begin
         variable curr_line : STD_LOGIC_VECTOR (3 downto 0) := "0000";
         variable curr_char : integer := 0;
         variable curr_row : integer := 0;
-        variable curr_char_line : STD_LOGIC_VECTOR (7 downto 0);
+        variable curr_char_line : STD_LOGIC_VECTOR (0 to 7);
         
         variable char_to_print : std_logic_vector (7 downto 0);
     begin
         if rising_edge(clk_i) then
             char_ready_o <= '0';
+            transmision_finished_o <= '0';
             case state is
                 when idle =>
                     curr_row_sig <= 0;
                     curr_char_sig <= 0;
                     if data_ready_i = '1' then
                         state <= transmiting;
-                        transmision_finished_o <= '0';
+                        
                     end if;
                 when waiting_for_sender =>
-                    if sender_ready_i = '0' then
+                    if sender_ready_i = '1' then
+                   
                         state <= transmiting;
                         
                         if curr_line = "0000" and curr_char = 0 and curr_row = 0 then
@@ -107,9 +109,14 @@ begin
                         end if;
                     end if;
                 when transmiting =>
+                    curr_char_line := next_char_line;
+                    state <= waiting_for_sender;
                     if sender_ready_i = '1' then
-                        state <= waiting_for_sender;
+        
                         char_to_print := char_arr_i(curr_char);
+                        if (unsigned(char_to_print) < 32 or unsigned(char_to_print) > 127) and char_to_print /= x"0D" then
+                            char_to_print := x"2A";
+                        end if;
                         if curr_char_line(curr_row) = '1' or char_to_print = x"0D" or char_to_print = x"0A" then
                             char_o <= char_to_print;
                         else
@@ -119,23 +126,25 @@ begin
                         curr_row := curr_row + 1;
                     end if;
                     
-                    --Variables are "broken" with signals to fulfill time constraints
-                    curr_row_sig <= curr_row;
+                    
 
                     if curr_row_sig = 8 or char_to_print = x"0D" or char_to_print = x"0A" then
                         curr_char := curr_char + 1;
                         curr_row := 0;
                     end if;
+                    --Variables are "broken" with signals to fulfill time constraints
+                    curr_row_sig <= curr_row;
                     
-                    curr_char_sig <= curr_char;
                     
-                    if curr_char_sig = char_count_i then
+                    
+                    if curr_char >= char_count_i then
                         curr_line := std_logic_vector(unsigned(curr_line) + 1);
                         curr_char := 0;
                     end if;
+                    curr_char_sig <= curr_char;
 
-                    addra <= char_arr_i(curr_char_sig) & curr_line;
-                    curr_char_line := next_char_line;
+                    addra <= char_arr_i(curr_char) & curr_line;
+                    
             end case;
         end if;
     end process;

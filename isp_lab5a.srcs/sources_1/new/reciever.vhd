@@ -41,7 +41,7 @@ entity reciever is
 end reciever;
 
 architecture Behavioral of reciever is
-    type StateType is (idle, recieving);
+    type StateType is (idle, recieving, saving);
     signal state : StateType := idle;
     
     component encoder is
@@ -76,11 +76,11 @@ begin
                     if (counter = 10417) then
                         counter := 0;
                         if (position = 8) then
-                            state <= idle;
+                            state <= saving;
                             position := 0;
                             ascii_o <= output;
                             num <= output;
-                            write_en_o <= '1';
+                            
                         else
                             output(position) := RXD_i;
                             position := (position + 1);
@@ -88,6 +88,9 @@ begin
                     else
                         counter := counter + 1;
                     end if;
+                when saving =>
+                    state <= idle;
+                    write_en_o <= '1';
             end case;
         end if;
     end process;

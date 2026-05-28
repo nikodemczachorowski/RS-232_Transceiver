@@ -62,7 +62,7 @@ begin
             wait for BIT_PERIOD;
             RXD_i <= '1';
             wait for BIT_PERIOD;
-            wait for 1sec;
+            wait for 100ns;
         end process;
  
  
